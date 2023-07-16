@@ -20,13 +20,29 @@ public class UserService {
 
     public UserDto addUser(UserDto userDto) {
         User user = UserMapper.toModel(userDto);
-        throwIfEmailExist(user.getEmail());
+        if (userRepository.isEmailExisted(user.getEmail())) {
+            throw new ValidationException("Пользователь с email = " + userDto.getEmail() + " существует");
+        }
         return UserMapper.toDto(userRepository.addUser(user));
     }
 
     public UserDto updateUser(long userId, UserDto userDto) {
         throwIfUserNotExist(userId);
-        return UserMapper.toDto(userRepository.updateUser(updateUserInfo(userId, userDto)));
+        User user = userRepository.findUserById(userId);
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
+            if (userRepository.isEmailExisted(userDto.getEmail())) {
+                if (!userDto.getEmail().equals(user.getEmail())) {
+                    throw new ValidationException("Пользователь с email " + userDto.getEmail() + " существует");
+                }
+            }
+            user.setEmail(userDto.getEmail());
+        }
+
+
+        return UserMapper.toDto(user);
     }
 
     public void deleteUser(long userId) {
@@ -39,7 +55,7 @@ public class UserService {
 
     public UserDto getUserById(long userId) {
         throwIfUserNotExist(userId);
-        return UserMapper.toDto(userRepository.findItemById(userId));
+        return UserMapper.toDto(userRepository.findUserById(userId));
     }
 
     public List<UserDto> getAllUsers() {
@@ -53,26 +69,4 @@ public class UserService {
             throw new NotExistException("Пользователь с id " + userId + " не найден");
     }
 
-    private void throwIfEmailExist(String email) {
-        String newUserEmail = email.toLowerCase();
-        for (User existingUser : userRepository.findAll()) {
-            if (newUserEmail.equals(existingUser.getEmail().toLowerCase())) {
-                throw new ValidationException("Пользователь с email " + newUserEmail + " уже существует");
-            }
-        }
-    }
-
-    private User updateUserInfo(long userId, UserDto userDto) {
-        User userInfo = UserMapper.toModel(userDto);
-        User oldUserInfo = userRepository.findItemById(userId);
-        if (userInfo.getEmail() == null) {
-            userInfo.setEmail(oldUserInfo.getEmail());
-        } else {
-            throwIfEmailExist(userInfo.getEmail());
-        }
-        if (userInfo.getName() == null)
-            userInfo.setName(oldUserInfo.getName());
-        userInfo.setId(userId);
-        return userInfo;
-    }
 }

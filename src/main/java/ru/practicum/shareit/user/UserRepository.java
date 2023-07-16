@@ -12,9 +12,11 @@ public interface UserRepository {
 
     void deleteUserById(long userId);
 
-    User findItemById(long userId);
+    User findUserById(long userId);
 
     List<User> findAll();
 
     boolean checkUserExist(long userId);
+
+    Boolean isEmailExisted(String email);
 }

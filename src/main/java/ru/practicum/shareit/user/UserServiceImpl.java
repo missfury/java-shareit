@@ -10,7 +10,7 @@ import java.util.*;
 @Slf4j
 @Component
 @Repository
-public class UserServiceDaoImpl implements UserRepository {
+public class UserServiceImpl implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
     private long lastUserId;
 
@@ -37,7 +37,7 @@ public class UserServiceDaoImpl implements UserRepository {
     }
 
     @Override
-    public User findItemById(long userId) {
+    public User findUserById(long userId) {
         return users.get(userId);
     }
 
@@ -49,5 +49,14 @@ public class UserServiceDaoImpl implements UserRepository {
     @Override
     public boolean checkUserExist(long userId) {
         return users.containsKey(userId);
+    }
+
+    public final Boolean isEmailExisted(String email) {
+        for (User userList : users.values()) {
+            if (userList.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
