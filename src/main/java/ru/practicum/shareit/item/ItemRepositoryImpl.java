@@ -22,21 +22,21 @@ public class ItemRepositoryImpl implements ItemRepository {
         long itemId = ++lastItemId;
         item.setId(itemId);
         items.put(itemId, item);
-        log.info("Предмет с id: {} добавлен", itemId);
+        log.info("Предмет с id: {} добавлен.", itemId);
         return item;
     }
 
     @Override
     public Item updateItem(Item item) {
         items.put(item.getId(), item);
-        log.info("Информация о предмете с id: {} обновлена", item.getId());
+        log.info("Информация о предмете с id: {} обновлена.", item.getId());
         return item;
     }
 
     @Override
     public void deleteItemById(long itemId) {
         items.remove(itemId);
-        log.info("Предмет с id: {} удален", itemId);
+        log.info("Предмет с id: {} удален.", itemId);
     }
 
     @Override

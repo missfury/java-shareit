@@ -19,21 +19,21 @@ public class UserServiceDaoImpl implements UserRepository {
         long userId = ++lastUserId;
         user.setId(userId);
         users.put(userId,user);
-        log.info("Пользователь с id: {} добавлен", user.getId());
+        log.info("Пользователь с id: {} добавлен.", user.getId());
         return user;
     }
 
     @Override
     public User updateUser(User user) {
         users.put(user.getId(), user);
-        log.info("Информация о пользователе с id: {} обновлена", user.getId());
+        log.info("Информация о пользователе с id: {} обновлена.", user.getId());
         return user;
     }
 
     @Override
     public void deleteUserById(long userId) {
         users.remove(userId);
-        log.info("Пользователь с id: {} удален", userId);
+        log.info("Пользователь с id: {} удален.", userId);
     }
 
     @Override
