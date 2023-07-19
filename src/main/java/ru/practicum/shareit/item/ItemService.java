@@ -26,8 +26,9 @@ public class ItemService {
     public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         userService.throwIfUserNotExist(userId);
         throwIfItemNotExist(itemId);
-        if (itemRepository.findItemById(itemId).getOwnerId() != userId)
+        if (itemRepository.findItemById(itemId).getOwnerId() != userId) {
             throw new NotExistException("Предмет с id " + itemId + " не принадлежит пользователю с id " + userId);
+        }
         return ItemMapper.toDto(itemRepository.updateItem(updateItemInfo(itemId, itemDto)));
     }
 
@@ -50,8 +51,9 @@ public class ItemService {
     }
 
     public List<ItemDto> searchItemsByText(String text) {
-        if (text.isEmpty())
+        if (text.isEmpty()) {
             return List.of();
+        }
         return itemRepository.findItemsByText(text).stream()
                 .map(ItemMapper::toDto)
                 .collect(Collectors.toList());
@@ -60,19 +62,23 @@ public class ItemService {
     private Item updateItemInfo(long id, ItemDto itemDto) {
         Item itemInfo = ItemMapper.toModel(itemDto);
         Item oldItemInfo = itemRepository.findItemById(id);
-        if (itemInfo.getName() == null)
+        if (itemInfo.getName() == null) {
             itemInfo.setName(oldItemInfo.getName());
-        if (itemInfo.getDescription() == null)
+        }
+        if (itemInfo.getDescription() == null) {
             itemInfo.setDescription(oldItemInfo.getDescription());
-        if (itemInfo.getAvailable() == null)
+        }
+        if (itemInfo.getAvailable() == null) {
             itemInfo.setAvailable(oldItemInfo.getAvailable());
+        }
         itemInfo.setId(id);
         itemInfo.setOwnerId(oldItemInfo.getOwnerId());
         return itemInfo;
     }
 
     private void throwIfItemNotExist(long id) {
-        if (!itemRepository.checkItemExist(id))
+        if (!itemRepository.checkItemExist(id)) {
             throw new NotExistException("Предмет с id " + id + " не найден");
+        }
     }
 }

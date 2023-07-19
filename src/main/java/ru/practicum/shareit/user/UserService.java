@@ -65,8 +65,9 @@ public class UserService {
     }
 
     public void throwIfUserNotExist(long userId) {
-        if (!userRepository.checkUserExist(userId))
+        if (!userRepository.checkUserExist(userId)) {
             throw new NotExistException("Пользователь с id " + userId + " не найден");
+        }
     }
 
 }
