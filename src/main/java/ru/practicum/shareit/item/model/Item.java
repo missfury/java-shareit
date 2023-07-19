@@ -10,7 +10,7 @@ public class Item {
     private Boolean available;
     private long ownerId;
 
-    public Item (String name, String description, Boolean available) {
+    public Item(String name, String description, Boolean available) {
         this.name = name;
         this.description = description;
         this.available = available;
