@@ -16,21 +16,21 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handlerValidationException(final ValidationException e) {
-        log.error("Validation error: {}", e.getMessage());
+        log.debug("Validation error: {}", e.getMessage());
         return Map.of("Validation exception", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handlerNotFoundException(final NotExistException e) {
-        log.error("Not found error: {}", e.getMessage());
+        log.debug("Not found error: {}", e.getMessage());
         return Map.of("Not found exception", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handlerInternalException(final InternalException e) {
-        log.error("Internal error {}: {},", e.getClass(), e.getMessage());
+        log.debug("Internal error {}: {},", e.getClass(), e.getMessage());
         return Map.of("Internal exception", e.getMessage());
     }
 }
