@@ -21,14 +21,14 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerException(final NotFoundException e) {
-        log.debug("Not found error: {}", e.getMessage());
+        log.error("Not found error: {}", e.getMessage());
         return new ErrorResponse("Not Found Exception", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleServerErrorException(Throwable e) {
-        log.debug("Server error {}: {},", e.getClass(), e.getMessage());
+        log.error("Server error {}: {},", e.getClass(), e.getMessage());
         return new ErrorResponse("internal server error", e.getMessage());
     }
 
@@ -36,7 +36,7 @@ public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         return ex.getBindingResult().getFieldErrors().stream()
-                .peek(e -> log.debug("Validation error: {}", e.getDefaultMessage()))
+                .peek(e -> log.error("Validation error: {}", e.getDefaultMessage()))
                 .collect(Collectors.toMap(
                         FieldError::getField,
                         e -> (e.getDefaultMessage() == null) ? "validation error" : e.getDefaultMessage()
@@ -46,28 +46,28 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleWrongState(final NotSupportedStateException e) {
-        log.debug("Not found error: {}", e.getMessage());
+        log.error("Not found error: {}", e.getMessage());
         return new ErrorResponse(e.getMessage(), e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse notAvailableException(final NotAvailableException e) {
-        log.debug("Not found error: {}", e.getMessage());
+        log.error("Not found error: {}", e.getMessage());
         return new ErrorResponse("Available error", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse duplicateException(final CloneNotSupportedException e) {
-        log.debug("Not found error: {}", e.getMessage());
+        log.error("Not found error: {}", e.getMessage());
         return new ErrorResponse("Duplicate error", e.getMessage());
     }
 
     @ExceptionHandler({AlreadyExistsException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse alreadyExistsException(final RuntimeException e) {
-        log.debug("Not found error: {}", e.getMessage());
+        log.error("Not found error: {}", e.getMessage());
         return new ErrorResponse("Already exists error", e.getMessage());
     }
 }

@@ -25,7 +25,6 @@ public class UserController {
         return user;
     }
 
-    @ResponseBody
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable long userId, @RequestBody UserDto userDto) {
         log.info(String.format("PATCH /users/{userId}, body = %s, {userId} = %s", userDto, userId));

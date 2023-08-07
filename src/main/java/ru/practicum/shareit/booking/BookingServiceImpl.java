@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.exception.NotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -43,7 +44,6 @@ public class BookingServiceImpl implements BookingService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Невозможно создать бронирование - " +
                         "Не найден пользователь с id " + userId));
-
         if (bookingShortDto.getStart().isEqual(bookingShortDto.getEnd()) ||
                 bookingShortDto.getStart().isAfter(bookingShortDto.getEnd())) {
             throw new NotAvailableException("Дата окончания бронирования не может быть раньше даты начала");
@@ -53,6 +53,17 @@ public class BookingServiceImpl implements BookingService {
         }
         if (!item.getAvailable()) {
             throw new NotAvailableException("Предмет с id= " + userId + " недоступен для бронирования");
+        }
+
+        LocalDateTime bookingStart = bookingShortDto.getStart();
+        LocalDateTime bookingEnd = bookingShortDto.getEnd();
+
+        List<Booking> conflictingBookings = bookingRepository.findAllByItemIdAndStartBeforeAndEndAfter(
+                bookingShortDto.getItemId(), bookingEnd, bookingStart, Sort.by(Sort.Direction.ASC, "start"));
+
+        if (!conflictingBookings.isEmpty()) {
+            throw new NotAvailableException("Предмет с id= " + bookingShortDto.getItemId() +
+            " уже забронирован на указанные даты");
         }
 
         Booking booking = bookToShortDto(bookingShortDto);
@@ -161,7 +172,10 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Пользователь с id= " + id + " не является собственником предмета");
         }
         if (booking.getStatus().equals(Status.APPROVED)) {
-            throw new NotAvailableException("Бронирование предмета с id= " + bookingId + " еще не подтверждено");
+            throw new NotAvailableException("Бронирование предмета с id= " + bookingId + " уже подтверждено");
+        }
+        if (booking.getStatus().equals(Status.REJECTED)) {
+            throw new NotAvailableException("Бронирование предмета с id= " + bookingId + " уже было отклонено вами");
         }
         if (approved) {
             booking.setStatus(Status.APPROVED);
