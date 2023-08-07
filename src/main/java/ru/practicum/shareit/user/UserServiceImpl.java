@@ -1,60 +1,82 @@
 package ru.practicum.shareit.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.AlreadyExistsException;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.user.UserMapper.userToDto;
+import static ru.practicum.shareit.user.UserMapper.userToModel;
 
 @Slf4j
-@Repository
-public class UserServiceImpl implements UserRepository {
-    private final Map<Long, User> users = new HashMap<>();
-    private long lastUserId;
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
-    public User addUser(User user) {
-        long userId = ++lastUserId;
-        user.setId(userId);
-        users.put(userId,user);
-        log.info("Пользователь с id: {} добавлен.", user.getId());
-        return user;
-    }
-
-    @Override
-    public User updateUser(User user) {
-        users.put(user.getId(), user);
-        log.info("Информация о пользователе с id: {} обновлена.", user.getId());
-        return user;
-    }
-
-    @Override
-    public void deleteUserById(long userId) {
-        users.remove(userId);
-        log.info("Пользователь с id: {} удален.", userId);
-    }
-
-    @Override
-    public User findUserById(long userId) {
-        return users.get(userId);
-    }
-
-    @Override
-    public List<User> findAll() {
-        return new ArrayList<>(users.values());
-    }
-
-    @Override
-    public boolean checkUserExist(long userId) {
-        return users.containsKey(userId);
-    }
-
-    public final Boolean isEmailExisted(String email) {
-        for (User userList : users.values()) {
-            if (userList.getEmail().equals(email)) {
-                return true;
-            }
+    public UserDto addUser(UserDto userDto) {
+        User user = userToModel(userDto);
+        try {
+            return userToDto(userRepository.save(user));
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistsException(String.format(
+                    "Пользователь с email %s уже зарегистрирован", userDto.getEmail()
+            ));
         }
-        return false;
+    }
+
+    @Override
+    public UserDto updateUser(long userId, UserDto userDto) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Error"));
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
+            user.setEmail(userDto.getEmail());
+        }
+        try {
+            return userToDto(userRepository.saveAndFlush(user));
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistsException("Пользователь уже существует");
+        }
+    }
+
+    @Override
+    public Boolean deleteUser(long userId) {
+        if (userRepository.existsById(userId)) {
+            itemRepository.deleteAll(itemRepository.findAllByOwnerId(userId));
+            userRepository.deleteById(userId);
+        }
+        return !userRepository.existsById(userId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserDto getUserById(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(String.format(
+                        "Пользователя с id %s не существует", userId)));
+        return userToDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::userToDto)
+                .collect(Collectors.toList());
     }
 }
