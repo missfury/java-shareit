@@ -7,10 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.AlreadyExistsException;
-import ru.practicum.shareit.exception.NotAvailableException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.NotSupportedStateException;
+import ru.practicum.shareit.exception.*;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,5 +66,13 @@ public class ErrorHandler {
     public ErrorResponse alreadyExistsException(final RuntimeException e) {
         log.error("Not found error: {}", e.getMessage());
         return new ErrorResponse("Already exists error", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationException(final ValidationException e) {
+        log.error("Validation exception: {}", e.getMessage());
+        return Map.of("error", "Validation exception",
+                "errorMessage", e.getMessage());
     }
 }
