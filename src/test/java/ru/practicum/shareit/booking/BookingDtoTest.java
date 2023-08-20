@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 class BookingDtoTest {
     @Autowired
     private JacksonTester<BookingDto> json;
-    private static final String TIME_PATTERN_TEST = "yyyy-MM-dd HH:mm:ssssss";
+    private static final String TIME_PATTERN_TEST = "yyyy-MM-dd HH:mm:SSSSSS";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN_TEST);
 
     @Test
