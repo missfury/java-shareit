@@ -18,7 +18,7 @@ class CommentDtoTest {
 
     @Autowired
     private JacksonTester<CommentDto> json;
-    private static final String TIME_PATTERN_TEST = "yyyy-MM-dd HH:mm:SSSSSS";
+    private static final String TIME_PATTERN_TEST = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN_TEST);
 
     @Test
