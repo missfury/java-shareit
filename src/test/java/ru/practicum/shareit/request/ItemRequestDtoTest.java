@@ -36,7 +36,7 @@ public class ItemRequestDtoTest {
         JsonContent<ItemRequestDto> result = json.write(itemRequestDto);
 
         Assertions.assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
-        Assertions.assertThat(result).extractingJsonPathStringValue("$.description").
-        isEqualTo(itemRequestDto.getDescription());
+        Assertions.assertThat(result).extractingJsonPathStringValue("$.description")
+                .isEqualTo(itemRequestDto.getDescription());
     }
 }
