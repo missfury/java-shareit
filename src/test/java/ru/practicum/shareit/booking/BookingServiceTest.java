@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -178,7 +179,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.ALL);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByItemOwnerId(anyLong(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -190,7 +192,8 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(anyLong(), any(), any(), any()))
                 .thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -201,7 +204,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.PAST);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByItemOwnerIdAndEndBefore(anyLong(), any(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -212,7 +216,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.FUTURE);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByItemOwnerIdAndStartAfter(anyLong(), any(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -224,7 +229,8 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByItemOwnerIdAndStatus(anyLong(), any(), any()))
                 .thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -236,7 +242,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.REJECTED);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByItemOwnerIdAndStatus(anyLong(), any(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllOwnersBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -248,7 +255,7 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
         assertThrows(NotFoundException.class, () -> bookingService.getAllOwnersBookingByState(userId,
-                state, 0, 10));
+                state, PageRequest.of(0, 10)));
     }
 
     @Test
@@ -258,7 +265,7 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
         assertThrows(NotSupportedStateException.class, () -> bookingService.getAllOwnersBookingByState(userId,
-                state, 0, 10));
+                state, PageRequest.of(0, 10)));
     }
 
     @Test
@@ -267,7 +274,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.ALL);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerId(anyLong(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -279,7 +287,8 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(anyLong(), any(), any(), any()))
                 .thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -290,7 +299,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.PAST);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerIdAndEndBefore(anyLong(), any(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -302,7 +312,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.FUTURE);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerIdAndStartAfter(anyLong(), any(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -313,7 +324,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.WAITING);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerIdAndStatus(anyLong(), any(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -324,7 +336,8 @@ public class BookingServiceTest {
         String state = String.valueOf(State.REJECTED);
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(bookingRepository.findAllByBookerIdAndStatus(anyLong(), any(), any())).thenReturn(List.of(booking));
-        List<BookingDto> result = bookingService.getAllBookingByState(userId, state, 0, 10);
+        List<BookingDto> result = bookingService.getAllBookingByState(userId, state,
+                PageRequest.of(0, 10));
 
         assertEquals(1, result.size());
     }
@@ -336,7 +349,7 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
         assertThrows(NotSupportedStateException.class, () -> bookingService.getAllBookingByState(userId,
-                state, 0, 10));
+                state, PageRequest.of(0, 10)));
     }
 
     @Test
@@ -346,7 +359,7 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(false);
 
         assertThrows(NotFoundException.class, () -> bookingService.getAllBookingByState(userId,
-                state, 0, 10));
+                state, PageRequest.of(0, 10)));
     }
 
     @Test

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemShortDto;
@@ -23,7 +25,8 @@ import static ru.practicum.shareit.user.UserMapper.userToModel;
 
 
 @Transactional
-@SpringBootTest(properties = {"db.name=test"})
+@SpringBootTest
+@AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ItemRequestServiceIntegrationTest {
     private final ItemRequestService itemRequestService;
@@ -70,7 +73,7 @@ public class ItemRequestServiceIntegrationTest {
                 .build();
         savedRequest = itemRequestService.addRequest(savedRequestor.getId(), itemRequestToShortDto(addItemRequestDto));
         List<ItemRequestDto> requestsList = itemRequestService.getAllRequestsByRequester(savedRequestor.getId(),
-        0, 10);
+        PageRequest.of(0, 10));
 
         assertEquals(1, requestsList.size());
         assertEquals(savedRequest.getId(), requestsList.get(0).getId());

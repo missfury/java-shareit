@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -97,7 +98,7 @@ public class ItemRequestServiceTest {
         Long userId = 999L;
         when(userRepository.existsById(anyLong())).thenReturn(false);
         assertThrows(NotFoundException.class, () ->
-        itemRequestService.getAllRequestsByRequester(userId, 0, 10));
+        itemRequestService.getAllRequestsByRequester(userId, PageRequest.of(0, 10)));
 
         verify(itemRequestRepository, never()).findByRequesterId(anyLong(), any());
     }
@@ -134,7 +135,7 @@ public class ItemRequestServiceTest {
                 .thenReturn(List.of(itemRequest));
 
         List<ItemRequestDto> expectedDtoList = List.of(itemRequestDto);
-        List<ItemRequestDto> actualDtoList = itemRequestService.getAllRequests(userId, 0, 10);
+        List<ItemRequestDto> actualDtoList = itemRequestService.getAllRequests(userId, PageRequest.of(0, 10));
 
         assertEquals(expectedDtoList.get(0).getId(), actualDtoList.get(0).getId());
         assertEquals(expectedDtoList.get(0).getDescription(), actualDtoList.get(0).getDescription());
@@ -150,7 +151,8 @@ public class ItemRequestServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(itemRequestRepository.findAllByRequesterId(anyLong(), any())).thenReturn(List.of(itemRequest));
         List<ItemRequestDto> expectedDtoList = List.of(itemRequestDto);
-        List<ItemRequestDto> actualDtoList = itemRequestService.getAllRequestsByRequester(userId, 0, 10);
+        List<ItemRequestDto> actualDtoList = itemRequestService.getAllRequestsByRequester(userId,
+                PageRequest.of(0, 10));
 
         assertEquals(expectedDtoList.get(0).getId(), actualDtoList.get(0).getId());
         assertEquals(expectedDtoList.get(0).getDescription(), actualDtoList.get(0).getDescription());
@@ -180,7 +182,7 @@ public class ItemRequestServiceTest {
         Long userId = 999L;
         when(userRepository.existsById(anyLong())).thenReturn(false);
         assertThrows(NotFoundException.class, () ->
-        itemRequestService.getAllRequestsByRequester(userId, 0, 10));
+        itemRequestService.getAllRequestsByRequester(userId, PageRequest.of(0, 10)));
 
         verify(itemRequestRepository, never()).findByRequesterId(anyLong(), any());
     }

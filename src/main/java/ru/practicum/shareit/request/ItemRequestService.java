@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestShortDto;
 
@@ -11,8 +12,8 @@ public interface ItemRequestService {
 
     ItemRequestDto getRequestById(Long id, Long requestId);
 
-    List<ItemRequestDto> getAllRequests(Long id, int from, int size);
+    List<ItemRequestDto> getAllRequests(Long id, Pageable page);
 
-    List<ItemRequestDto> getAllRequestsByRequester(Long userId, int from, int size);
+    List<ItemRequestDto> getAllRequestsByRequester(Long userId, Pageable page);
 
 }

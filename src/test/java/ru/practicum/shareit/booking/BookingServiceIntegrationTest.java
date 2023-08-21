@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -99,7 +100,8 @@ public class BookingServiceIntegrationTest {
         int from = 0;
         int size = 10;
         List<BookingDto> bookingDtoList =
-                bookingService.getAllOwnersBookingByState(userId, String.valueOf(State.ALL), from, size);
+                bookingService.getAllOwnersBookingByState(userId, String.valueOf(State.ALL),
+                        PageRequest.of(from, size));
 
         assertEquals(2, bookingDtoList.size());
         assertEquals(savedBooking.getId(), bookingDtoList.get(0).getId());

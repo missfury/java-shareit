@@ -61,7 +61,12 @@ class ItemRequestMapperTest {
     @Test
     void toItemRequestDtoWithItemsTest() {
         List<ItemDto> itemDtos = new ArrayList<>();
-        itemDtos.add(new ItemDto(item.getId(), item.getName(), item.getDescription(), item.getAvailable()));
+        itemDtos.add(ItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .build());
         ItemRequestDto itemRequestDto = ItemRequestMapper.toItemRequestDto(itemRequest, itemDtos);
 
         assertThat(itemRequestDto.getId()).isEqualTo(itemRequest.getId());

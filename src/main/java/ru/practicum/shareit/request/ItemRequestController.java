@@ -13,6 +13,8 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+import static ru.practicum.shareit.util.Pagination.getPageOrThrow;
+
 
 @RestController
 @RequestMapping(path = "/requests")
@@ -42,7 +44,7 @@ public class ItemRequestController {
                                                @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                @Positive @RequestParam(defaultValue = "10") Integer size) {
         log.info("Получены все запросы");
-        return requestService.getAllRequests(id, from, size);
+        return requestService.getAllRequests(id, getPageOrThrow(from, size));
     }
 
     @GetMapping()
@@ -50,7 +52,7 @@ public class ItemRequestController {
                                                           @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                           @Positive @RequestParam(defaultValue = "10") Integer size) {
         log.info("Получены запросы пользователя ");
-        return requestService.getAllRequestsByRequester(id, from, size);
+        return requestService.getAllRequestsByRequester(id, getPageOrThrow(from, size));
     }
 
 }

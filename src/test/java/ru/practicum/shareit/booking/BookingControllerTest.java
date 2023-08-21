@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
@@ -31,7 +32,7 @@ public class BookingControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private BookingServiceImpl bookingService;
+    private BookingService bookingService;
     private final LocalDateTime start = LocalDateTime.now().plusDays(1);
     private final LocalDateTime end = start.plusDays(2);
 
@@ -133,12 +134,13 @@ public class BookingControllerTest {
     @Test
     void getAllByOwnerTest() {
         BookingDto bookingDto = new BookingDto(1L, start, end, Status.WAITING, null, null);
-        when(bookingService.getAllOwnersBookingByState(anyLong(), any(), anyInt(),
-                anyInt())).thenReturn(List.of(bookingDto));
+        when(bookingService.getAllOwnersBookingByState(anyLong(), any(), any(Pageable.class)))
+                .thenReturn(List.of(bookingDto));
+
         String result = mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", 1)
                         .param("state", "ALL")
-                        .param("from", String.valueOf(0))
+                        .param("page", String.valueOf(0))
                         .param("size", String.valueOf(10)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -153,8 +155,8 @@ public class BookingControllerTest {
     @Test
     void getAllBookingByStateTest() {
         BookingDto bookingDto = new BookingDto(1L, start, end, Status.WAITING, null, null);
-        when(bookingService.getAllBookingByState(anyLong(), any(), anyInt(),
-                anyInt())).thenReturn(List.of(bookingDto));
+        when(bookingService.getAllBookingByState(anyLong(), any(), any(Pageable.class)))
+                .thenReturn(List.of(bookingDto));
         String result = mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", 1)
                         .param("state", "ALL")

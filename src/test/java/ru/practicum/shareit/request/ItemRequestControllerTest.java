@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -153,7 +154,7 @@ class ItemRequestControllerTest {
     void getAllRequestsByRequesterTest() throws Exception {
         List<ItemRequestDto> itemRequests = new ArrayList<>();
         itemRequests.add(itemRequestDtoAnother);
-        when(itemRequestService.getAllRequestsByRequester(anyLong(), anyInt(), anyInt())).thenReturn(itemRequests);
+        when(itemRequestService.getAllRequestsByRequester(anyLong(), any(Pageable.class))).thenReturn(itemRequests);
 
         mockMvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", 1)
@@ -171,7 +172,7 @@ class ItemRequestControllerTest {
         Integer size = 10;
         ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "description", userId, null,
                 List.of());
-        when(itemRequestService.getAllRequestsByRequester(anyLong(), anyInt(), anyInt()))
+        when(itemRequestService.getAllRequestsByRequester(anyLong(), any(Pageable.class)))
                 .thenReturn(List.of(itemRequestDto));
         String result = mockMvc.perform(get("/requests")
                         .header("X-Sharer-User-Id", userId)

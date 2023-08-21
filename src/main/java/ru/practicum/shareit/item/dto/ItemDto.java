@@ -28,13 +28,6 @@ public class ItemDto {
 
     private List<CommentDto> comments;
 
-    public ItemDto(Long id, String name, String description, Boolean available) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-    }
-
 
     @Data
     public static class Owner {

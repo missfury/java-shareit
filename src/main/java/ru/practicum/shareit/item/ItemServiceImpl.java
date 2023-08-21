@@ -46,7 +46,6 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRequestRepository requestsRepository;
     private final UserRepository userRepository;
 
-
     public ItemDto addItem(ItemShortDto itemShortDto, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()
                 -> new NotFoundException("Пользователь с id = : " + userId + " не найден"));

@@ -11,6 +11,8 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+import static ru.practicum.shareit.util.Pagination.getPageOrThrow;
+
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class BookingController {
                                                  @RequestParam(defaultValue = "ALL") String state,
                                                  @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                  @Positive @RequestParam(defaultValue = "10") Integer size) {
-        return bookingService.getAllBookingByState(id, state, from, size);
+        return bookingService.getAllBookingByState(id, state, getPageOrThrow(from, size));
     }
 
     @GetMapping("/owner")
@@ -44,7 +46,7 @@ public class BookingController {
                                                        @RequestParam(defaultValue = "ALL") String state,
                                                        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                                        @Positive @RequestParam(defaultValue = "10") Integer size) {
-        return bookingService.getAllOwnersBookingByState(id, state, from, size);
+        return bookingService.getAllOwnersBookingByState(id, state, getPageOrThrow(from, size));
     }
 
     @PatchMapping("/{bookingId}")

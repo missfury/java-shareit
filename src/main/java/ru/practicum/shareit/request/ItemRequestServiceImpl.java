@@ -35,6 +35,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final UserRepository userRepository;
     private final ItemRequestRepository itemRequestsRepository;
     private final ItemRepository itemRepository;
+    private final Sort sort = Sort.by(Sort.Direction.DESC, "created");
 
     @Override
     public ItemRequestDto addRequest(Long id, ItemRequestShortDto itemRequestShortDto) {
@@ -65,22 +66,24 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     }
 
-    public List<ItemRequestDto> getAllRequestsByRequester(Long id, int from, int size) {
+    public List<ItemRequestDto> getAllRequestsByRequester(Long id, Pageable page) {
         validateUser(id);
-        Pageable pageable = PageRequest.of(from, size, Sort.by("created").descending());
 
-        List<ItemRequest> itemRequests = itemRequestsRepository.findAllByRequesterId(id, pageable);
+        Pageable pageableWithSort = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
+
+        List<ItemRequest> itemRequests = itemRequestsRepository.findAllByRequesterId(id, pageableWithSort);
 
         log.info("Получены все запросы пользователя с id = {}", id);
         return getItemRequestsDtoWithItems(itemRequests);
     }
 
 
-    public List<ItemRequestDto> getAllRequests(Long id, int from, int size) {
+    public List<ItemRequestDto> getAllRequests(Long id, Pageable page) {
         validateUser(id);
-        Pageable pageable = PageRequest.of(from, size, Sort.by("created").descending());
 
-        List<ItemRequest> itemRequests = itemRequestsRepository.findAllByRequesterIdNot(id, pageable);
+        Pageable pageableWithSort = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
+
+        List<ItemRequest> itemRequests = itemRequestsRepository.findAllByRequesterIdNot(id, pageableWithSort);
 
         log.info("Получены все запросы");
         return getItemRequestsDtoWithItems(itemRequests);
