@@ -1,16 +1,22 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
+
+import static ru.practicum.shareit.util.Pagination.getPageOrThrow;
 
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
+@Validated
 public class BookingController {
     private final BookingService bookingService;
     public static final String ITEM_OWNER_ID_HEADER = "X-Sharer-User-Id";
@@ -28,15 +34,19 @@ public class BookingController {
     }
 
     @GetMapping()
-    public List<BookingDto> getAllBookingByState(@RequestHeader(ITEM_OWNER_ID_HEADER) Long id,
-                                                 @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getAllBookingByState(id, state);
+    public List<BookingDto> getAllBookingByState(@RequestHeader("X-Sharer-User-Id") Long id,
+                                                 @RequestParam(defaultValue = "ALL") String state,
+                                                 @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                 @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getAllBookingByState(id, state, getPageOrThrow(from, size));
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getAllOwnersBookingByState(@RequestHeader(ITEM_OWNER_ID_HEADER) Long id,
-                                                       @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getAllOwnersBookingByState(id, state);
+    public List<BookingDto> getAllOwnersBookingByState(@RequestHeader("X-Sharer-User-Id") Long id,
+                                                       @RequestParam(defaultValue = "ALL") String state,
+                                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getAllOwnersBookingByState(id, state, getPageOrThrow(from, size));
     }
 
     @PatchMapping("/{bookingId}")

@@ -43,7 +43,7 @@ public class UserController {
     @GetMapping
     public List<UserDto> getUsers() {
         log.info("GET /users");
-        final List<UserDto> users = userService.getAllUsers();
+        List<UserDto> users = userService.getAllUsers();
         log.info(String.format("Успешно получены пользователи (%s шт.)", users.size()));
         return users;
     }

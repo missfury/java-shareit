@@ -9,6 +9,8 @@ import ru.practicum.shareit.item.dto.ItemShortDto;
 import javax.validation.Valid;
 import java.util.List;
 
+import static ru.practicum.shareit.util.Pagination.getPageOrThrow;
+
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -29,8 +31,10 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllItems(@RequestHeader(ITEM_OWNER_ID_HEADER) Long userId) {
-        return service.getAllItems(userId);
+    public List<ItemDto> getAllItems(@RequestHeader(ITEM_OWNER_ID_HEADER) Long userId,
+                                     @RequestParam(name = "from", required = false) Integer from,
+                                     @RequestParam(name = "size", required = false) Integer size) {
+        return service.getAllItems(userId, getPageOrThrow(from, size));
     }
 
     @PatchMapping("/{itemId}")
@@ -42,8 +46,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItemByText(@RequestParam String text) {
-        return service.searchItemByText(text);
+    public List<ItemDto> searchItemByText(@RequestParam String text,
+                                          @RequestParam(name = "from", required = false) Integer from,
+                                          @RequestParam(name = "size", required = false) Integer size) {
+        return service.searchItemByText(text, getPageOrThrow(from, size));
     }
 
 

@@ -28,6 +28,7 @@ public class ItemDto {
 
     private List<CommentDto> comments;
 
+
     @Data
     public static class Owner {
         private final Long id;

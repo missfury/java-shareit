@@ -28,6 +28,7 @@ public class ItemMapper {
                 .owner(new ItemDto.Owner(item.getOwner().getId(), item.getOwner().getName(),
                         item.getOwner().getEmail()))
                 .comments(new ArrayList<>())
+                .requestId(item.getRequest() == null ? null : item.getRequest().getId())
                 .build();
     }
 
@@ -38,6 +39,24 @@ public class ItemMapper {
                 .description(itemShortDto.getDescription())
                 .available(itemShortDto.getAvailable())
                 .comments(new ArrayList<>())
+                .build();
+    }
+
+    public static Item itemShortToModel(ItemShortDto itemShortDto) {
+        return Item.builder()
+                .id(itemShortDto.getId())
+                .name(itemShortDto.getName())
+                .description(itemShortDto.getDescription())
+                .available(itemShortDto.getAvailable())
+                .build();
+    }
+
+    public static ItemShortDto itemDtoToItemShortDto(ItemDto itemDto) {
+        return ItemShortDto.builder()
+                .id(itemDto.getId())
+                .name(itemDto.getName())
+                .description(itemDto.getDescription())
+                .available(itemDto.getAvailable())
                 .build();
     }
 

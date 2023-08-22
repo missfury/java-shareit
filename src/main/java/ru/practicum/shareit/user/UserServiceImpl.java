@@ -6,7 +6,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import static ru.practicum.shareit.user.UserMapper.userToModel;
 @Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
 
     @Override
     public UserDto addUser(UserDto userDto) {
@@ -46,20 +44,13 @@ public class UserServiceImpl implements UserService {
         if (userDto.getEmail() != null && !userDto.getEmail().isEmpty()) {
             user.setEmail(userDto.getEmail());
         }
-        try {
-            return userToDto(userRepository.saveAndFlush(user));
-        } catch (DataIntegrityViolationException e) {
-            throw new AlreadyExistsException("Пользователь уже существует");
-        }
+        userRepository.saveAndFlush(user);
+        return userToDto(user);
     }
 
     @Override
-    public Boolean deleteUser(long userId) {
-        if (userRepository.existsById(userId)) {
-            itemRepository.deleteAll(itemRepository.findAllByOwnerId(userId));
-            userRepository.deleteById(userId);
-        }
-        return !userRepository.existsById(userId);
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 
     @Transactional(readOnly = true)
@@ -79,4 +70,5 @@ public class UserServiceImpl implements UserService {
                 .map(UserMapper::userToDto)
                 .collect(Collectors.toList());
     }
+
 }

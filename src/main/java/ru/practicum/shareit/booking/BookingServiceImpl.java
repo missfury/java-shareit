@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    public static final Sort SORT_BY_DESC = Sort.by(Sort.Direction.DESC, "start");
+    private final Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
     @Override
     public BookingDto addBooking(Long userId, BookingShortDto bookingShortDto) {
@@ -77,7 +79,6 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public BookingDto getBooking(Long id, Long bookingId) {
-        validateUser(id);
         Booking booking = validateBooking(bookingId);
         if (!booking.getBooker().getId().equals(id) && !booking.getItem().getOwner().getId().equals(id)) {
             throw new NotFoundException("Пользователь с id= " + id +
@@ -88,31 +89,32 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllBookingByState(Long id, String stateString) {
+    public List<BookingDto> getAllBookingByState(Long id, String stateString, Pageable page) {
         validateUser(id);
         List<Booking> bookingList;
         LocalDateTime time = LocalDateTime.now();
+        Pageable pageableWithSort = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
 
         State state = validateState(stateString);
         switch (state) {
             case ALL:
-                bookingList = bookingRepository.findAllByBookerId(id, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByBookerId(id, pageableWithSort);
                 break;
             case CURRENT:
                 bookingList = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(id,
-                        time, time, SORT_BY_DESC);
+                        time, time, pageableWithSort);
                 break;
             case PAST:
-                bookingList = bookingRepository.findAllByBookerIdAndEndBefore(id, time, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByBookerIdAndEndBefore(id, time, pageableWithSort);
                 break;
             case FUTURE:
-                bookingList = bookingRepository.findAllByBookerIdAndStartAfter(id, time, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByBookerIdAndStartAfter(id, time, pageableWithSort);
                 break;
             case WAITING:
-                bookingList = bookingRepository.findAllByBookerIdAndStatus(id, Status.WAITING, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByBookerIdAndStatus(id, Status.WAITING, pageableWithSort);
                 break;
             case REJECTED:
-                bookingList = bookingRepository.findAllByBookerIdAndStatus(id, Status.REJECTED, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByBookerIdAndStatus(id, Status.REJECTED, pageableWithSort);
                 break;
             default:
                 bookingList = Collections.emptyList();
@@ -126,31 +128,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllOwnersBookingByState(Long id, String stateString) {
+    public List<BookingDto> getAllOwnersBookingByState(Long id, String stateString, Pageable page) {
         validateUser(id);
+
         List<Booking> bookingList;
         LocalDateTime now = LocalDateTime.now();
+        Pageable pageableWithSort = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
 
         State state = validateState(stateString);
         switch (state) {
             case ALL:
-                bookingList = bookingRepository.findAllByItemOwnerId(id, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByItemOwnerId(id, pageableWithSort);
                 break;
             case PAST:
-                bookingList = bookingRepository.findAllByItemOwnerIdAndEndBefore(id, now, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByItemOwnerIdAndEndBefore(id, now, pageableWithSort);
                 break;
             case CURRENT:
                 bookingList = bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(id,
-                        now, now, SORT_BY_DESC);
+                        now, now, pageableWithSort);
                 break;
             case FUTURE:
-                bookingList = bookingRepository.findAllByItemOwnerIdAndStartAfter(id, now, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByItemOwnerIdAndStartAfter(id, now, pageableWithSort);
                 break;
             case WAITING:
-                bookingList = bookingRepository.findAllByItemOwnerIdAndStatus(id, Status.WAITING, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByItemOwnerIdAndStatus(id, Status.WAITING, pageableWithSort);
                 break;
             case REJECTED:
-                bookingList = bookingRepository.findAllByItemOwnerIdAndStatus(id, Status.REJECTED, SORT_BY_DESC);
+                bookingList = bookingRepository.findAllByItemOwnerIdAndStatus(id, Status.REJECTED, pageableWithSort);
                 break;
             default:
                 bookingList = Collections.emptyList();
@@ -164,7 +168,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto approveBooking(Long id, Long bookingId, Boolean approved) {
-        validateUser(id);
         Booking booking = validateBooking(bookingId);
 
         if (!booking.getItem().getOwner().getId().equals(id)) {
@@ -181,8 +184,9 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(Status.REJECTED);
         }
+        bookingRepository.save(booking);
         log.info("Получено подтверждение бронирования предмета с id  = {}", bookingId);
-        return bookToDto(bookingRepository.save(booking));
+        return bookToDto(booking);
     }
 
     private Booking validateBooking(Long bookingId) {
