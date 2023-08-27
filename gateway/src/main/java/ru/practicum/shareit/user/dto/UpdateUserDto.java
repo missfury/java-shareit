@@ -12,7 +12,8 @@ import javax.validation.constraints.Size;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRequestDto {
+public class UpdateUserDto {
+    private Long id;
     @NotBlank
     @Size(max = 255)
     private String name;

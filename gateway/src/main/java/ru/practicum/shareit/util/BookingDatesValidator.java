@@ -1,12 +1,15 @@
 package ru.practicum.shareit.util;
 
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 import ru.practicum.shareit.exception.ValidationException;
 
+
 import java.time.LocalDateTime;
 
-public class DateValidator {
-    public static void validate(LocalDateTime start, LocalDateTime end) {
+@UtilityClass
+public class BookingDatesValidator {
+    public void validate(LocalDateTime start, LocalDateTime end) {
         if (start.equals(end)) {
             throw new ValidationException("Дата начала бронирования не может быть равна дате конца бронирования!");
         }
@@ -16,7 +19,7 @@ public class DateValidator {
         }
     }
 
-    public static void validate(BookItemRequestDto bookingDto) {
-        validate(bookingDto.getStart(), bookingDto.getEnd());
+    public void validate(BookItemRequestDto bookingCreateDto) {
+        validate(bookingCreateDto.getStart(), bookingCreateDto.getEnd());
     }
 }
