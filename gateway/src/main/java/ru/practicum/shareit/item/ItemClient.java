@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -12,11 +11,9 @@ import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
-@Slf4j
 public class ItemClient extends BaseClient {
     private static final String API_PREFIX = "/items";
 
@@ -30,41 +27,42 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addItem(Long userId, ItemDto requestDto) {
-        log.info("Create item for user with id = {} ", userId);
-        return post("", userId, requestDto);
+    public ResponseEntity<Object> addItem(long userId, ItemDto itemDto) {
+        return post("", userId, itemDto);
     }
 
-    public ResponseEntity<Object> getItemById(Long itemId, Long userId) {
-        log.info("Get item with id = {} for user with id = {} ", itemId, userId);
+    public ResponseEntity<Object> updateItem(long userId, long itemId, ItemDto itemDto) {
+        return patch("/" + itemId, userId, itemDto);
+    }
+
+    public void deleteItem(long userId, long itemId) {
+        delete("/" + itemId, userId);
+    }
+
+    public ResponseEntity<Object> getItem(long userId, long itemId) {
         return get("/" + itemId, userId);
     }
 
-    public ResponseEntity<Object> getItems(Long userId) {
-        log.info("Get items for user with id = {} ", userId);
-        return get("", userId);
+    public ResponseEntity<Object> getItemsByUserId(long userId, Integer from, Integer size) {
+        Map<String, Object> parameters = Map.of(
+                "from", from,
+                "size", size
+        );
+
+        return get("?from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> updateItem(ItemDto requestDto, Long itemId, Long userId) {
-        log.info("Update item with id = {} for user with id = {} ", itemId, userId);
-        return patch("/" + itemId, userId, requestDto);
+    public ResponseEntity<Object> searchItems(String text, Integer from, Integer size) {
+        Map<String, Object> parameters = Map.of(
+                "text", text,
+                "from", from,
+                "size", size
+        );
+
+        return get("/search?text={text}&from={from}&size={size}", null, parameters);
     }
 
-    public ResponseEntity<Object> searchItemByText(Long userId, String text) {
-        if (text.isBlank()) return ResponseEntity.ok(List.of());
-        Map<String, Object> parameters = Map.of("text", text);
-        log.info("Find item with text = {}", text);
-        return get("/search?text={text}", userId, parameters);
-    }
-
-    public ResponseEntity<Object> removeItem(Long itemId) {
-        log.info("Remove item with id = {}", itemId);
-        return delete("/" + itemId);
-    }
-
-
-    public ResponseEntity<Object> addComment(Long itemId, long userId, CommentDto requestDto) {
-        log.info("Create comment item with id = {}", itemId);
-        return post("/" + itemId + "/comment", userId, requestDto);
+    public ResponseEntity<Object> addComment(long userId, long itemId, CommentDto commentDto) {
+        return post("/" + itemId + "/comment", userId, commentDto);
     }
 }

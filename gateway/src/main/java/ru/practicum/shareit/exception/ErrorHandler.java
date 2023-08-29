@@ -4,57 +4,36 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ConstraintViolationException;
-import java.util.NoSuchElementException;
 
+import java.util.Objects;
 
-@Slf4j
 @RestControllerAdvice
+@Slf4j
 public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleServerErrorException(Throwable e) {
-        log.error("Server error {}: {},", e.getClass(), e.getMessage());
-        return new ErrorResponse("internal server error", e.getMessage());
+    public ErrorResponse handlerInternalException(final Exception e) {
+        log.error("Internal error occurred:", e);
+        return new ErrorResponse("INTERNAL ERROR", e.getMessage());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error("Caught Illegal Argument Exception: {}", e.getMessage());
+    public ErrorResponse handleUnsupportedStatusException(final UnsupportedStatusException e) {
+        log.error("Unsupported status exception occurred:", e);
         return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlerNoSuchElementException(NoSuchElementException e) {
-        log.error("Caught IllegalArgumentException: {}", e.getMessage());
-        return new ErrorResponse("NoSuchElementException", e.getMessage());
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalArgumentException(MethodArgumentNotValidException e) {
-        log.error("Method Argument Not Valid Exception: {}", e.getMessage());
-        return new ErrorResponse("MethodArgumentNotValidException", e.getMessage());
+    public ErrorResponse handleMethodArgumentNotValid(final MethodArgumentNotValidException exception) {
+        log.error("Bad request due to validation error:", exception);
+        return new ErrorResponse("BAD REQUEST", Objects.requireNonNull(exception.getFieldError())
+                .getDefaultMessage());
     }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerConstraintViolationException(ConstraintViolationException e) {
-        log.error("Constraint Violation Exception: {}", e.getMessage());
-        return new ErrorResponse("MethodArgumentNotValidException", e.getMessage());
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerConstraintViolationException(final ValidationException e) {
-        log.error("Validation Exception: {}", e.getMessage());
-        return new ErrorResponse("MValidation Exception ", e.getMessage());
-    }
-
 }

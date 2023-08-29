@@ -3,69 +3,85 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
-@Controller
-@RequestMapping("/items")
-@Slf4j
+@RestController
+@RequestMapping(path = "/items")
 @RequiredArgsConstructor
-@Validated
+@Slf4j
 public class ItemController {
-    private final ItemClient itemClient;
     public static final String ITEM_OWNER_ID_HEADER = "X-Sharer-User-Id";
+    private final ItemClient itemClient;
 
     @PostMapping
-    public ResponseEntity<Object> addItem(@RequestHeader(ITEM_OWNER_ID_HEADER) Long userId,
-                                          @Valid @RequestBody ItemDto requestDto) {
-        log.info("Create item");
-        return itemClient.addItem(userId, requestDto);
+    public ResponseEntity<Object> addItem(@RequestHeader(ITEM_OWNER_ID_HEADER) long userId,
+                                             @Valid @RequestBody ItemDto itemGateDto) {
+        log.info("Create item {}, userId={}", itemGateDto, userId);
+        return itemClient.addItem(userId, itemGateDto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getItemById(@PathVariable Long id,
-                                              @RequestHeader(ITEM_OWNER_ID_HEADER) Long userId) {
-        log.info("Get item with id = {}", id);
-        return itemClient.getItemById(id, userId);
+    @PatchMapping("/{itemId}")
+    public ResponseEntity<Object> updateItem(@RequestHeader(ITEM_OWNER_ID_HEADER) long userId,
+                                             @PathVariable long itemId,
+                                             @RequestBody ItemDto itemGateDto) {
+        log.info("Update item {}, userId={}, itemId={}", itemGateDto, userId, itemId);
+        return itemClient.updateItem(userId, itemId, itemGateDto);
+    }
+
+    @DeleteMapping("/{itemId}")
+    public void deleteItem(@RequestHeader(ITEM_OWNER_ID_HEADER) long userId,
+                           @PathVariable long itemId) {
+        log.info("Delete item with id={}, from userId={}", itemId, userId);
+        itemClient.deleteItem(userId, itemId);
+    }
+
+    @GetMapping("/{itemId}")
+    public ResponseEntity<Object> getItem(@RequestHeader(ITEM_OWNER_ID_HEADER) long userId,
+                                          @PathVariable long itemId) {
+        log.info("Get item with id={}, from userId={}", itemId, userId);
+        return itemClient.getItem(userId, itemId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getItems(@RequestHeader(ITEM_OWNER_ID_HEADER) Long userId) {
-        log.info("Get items {}", userId);
-        return itemClient.getItems(userId);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateItem(@RequestBody ItemDto requestDto,
-                                             @PathVariable Long id,
-                                             @RequestHeader(ITEM_OWNER_ID_HEADER) Long userId) {
-        log.info("Update item with id = {}", id);
-        return itemClient.updateItem(requestDto, id, userId);
+    public ResponseEntity<Object> getItemsByUserId(@RequestHeader(ITEM_OWNER_ID_HEADER)long userId,
+                                                   @PositiveOrZero @RequestParam(defaultValue = "0", required = false)
+                                                   Integer from,
+                                                   @Positive @RequestParam(defaultValue = "10", required = false)
+                                                   Integer size) {
+        log.info("Get items from owner with id: {}", userId);
+        return itemClient.getItemsByUserId(userId, from, size);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchItemByText(@RequestParam String text,
-                                                   @RequestHeader(ITEM_OWNER_ID_HEADER) Long userId) {
-        log.info("Search item by text {} ", text);
-        return itemClient.searchItemByText(userId, text);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> removeItem(@PathVariable Long id) {
-        log.info("Remove item with id = {}", id);
-        return itemClient.removeItem(id);
+    public ResponseEntity<Object> searchItems(@RequestParam String text,
+                                              @PositiveOrZero @RequestParam(defaultValue = "0", required = false)
+                                              Integer from,
+                                              @Positive @RequestParam(defaultValue = "10", required = false)
+                                                  Integer size) {
+        log.info("Search items with text={}", text);
+        return itemClient.searchItems(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> addComment(@PathVariable Long itemId,
-                                                @RequestHeader(ITEM_OWNER_ID_HEADER) Long userId,
-                                                @RequestBody CommentDto requestDto) {
-        log.info("Create comment for item with id = {}", itemId);
-        return itemClient.addComment(itemId, userId, requestDto);
+    public ResponseEntity<Object> addComment(@RequestHeader(ITEM_OWNER_ID_HEADER) long userId,
+                                                @PathVariable long itemId,
+                                                @Valid @RequestBody CommentDto commentDto) {
+        log.info("Create comment = {} to item with id: {} from user with id: {}", commentDto, itemId, userId);
+        return itemClient.addComment(userId, itemId, commentDto);
     }
 }

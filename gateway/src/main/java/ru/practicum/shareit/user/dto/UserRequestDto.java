@@ -7,18 +7,17 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.NotEmpty;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequestDto {
+    private Long id;
     @NotBlank
-    @Size(max = 255)
     private String name;
 
     @Email
-    @NotBlank
-    @Size(max = 512)
+    @NotEmpty
     private String email;
 }

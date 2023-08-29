@@ -64,7 +64,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (!conflictingBookings.isEmpty()) {
             throw new NotAvailableException("Предмет с id= " + bookingShortDto.getItemId() +
-            " уже забронирован на указанные даты");
+                    " уже забронирован на указанные даты");
         }
 
         Booking booking = bookToShortDto(bookingShortDto);

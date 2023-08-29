@@ -16,7 +16,6 @@ import ru.practicum.shareit.request.dto.ItemRequestShortDto;
 import ru.practicum.shareit.user.model.User;
 
 
-import javax.validation.ValidationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -98,20 +97,6 @@ class ItemRequestControllerTest {
                         .content(objectMapper.writeValueAsString(itemRequestDto))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void addRequestWithEmptyDescriptionTest() throws Exception {
-        itemRequestShortDto.setDescription("");
-        when(itemRequestService.addRequest(anyLong(), any()))
-                .thenThrow(new ValidationException("Описание не может быть пустым"));
-        mockMvc.perform(post("/requests")
-                        .content(objectMapper.writeValueAsString(itemRequestShortDto))
-                        .contentType("application/json")
-                        .header("X-Sharer-User-Id", 1)
-                        .contentType("application/json")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
     }
 
     @Test

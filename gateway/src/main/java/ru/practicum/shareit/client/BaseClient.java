@@ -1,15 +1,17 @@
 package ru.practicum.shareit.client;
 
-import org.springframework.http.*;
-import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import java.util.List;
 import java.util.Map;
 
 public class BaseClient {
-    public static final String ITEM_OWNER_ID_HEADER = "X-Sharer-User-Id";
     protected final RestTemplate rest;
 
     public BaseClient(RestTemplate rest) {
@@ -36,8 +38,8 @@ public class BaseClient {
         return post(path, userId, null, body);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, Long userId, @Nullable Map<String,
-            Object> parameters, T body) {
+    protected <T> ResponseEntity<Object> post(String path, Long userId, @Nullable Map<String, Object>
+            parameters, T body) {
         return makeAndSendRequest(HttpMethod.POST, path, userId, parameters, body);
     }
 
@@ -45,8 +47,8 @@ public class BaseClient {
         return put(path, userId, null, body);
     }
 
-    protected <T> ResponseEntity<Object> put(String path, long userId, @Nullable Map<String,
-            Object> parameters, T body) {
+    protected <T> ResponseEntity<Object> put(String path, long userId, @Nullable Map<String, Object>
+            parameters, T body) {
         return makeAndSendRequest(HttpMethod.PUT, path, userId, parameters, body);
     }
 
@@ -62,8 +64,8 @@ public class BaseClient {
         return patch(path, userId, null, body);
     }
 
-    protected <T> ResponseEntity<Object> patch(String path, Long userId, @Nullable Map<String,
-            Object> parameters, T body) {
+    protected <T> ResponseEntity<Object> patch(String path, Long userId, @Nullable Map<String, Object>
+            parameters, T body) {
         return makeAndSendRequest(HttpMethod.PATCH, path, userId, parameters, body);
     }
 
@@ -96,12 +98,12 @@ public class BaseClient {
         return prepareGatewayResponse(shareitServerResponse);
     }
 
-    private HttpHeaders defaultHeaders(Long userId) {
+    private static HttpHeaders defaultHeaders(Long userId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         if (userId != null) {
-            headers.set(ITEM_OWNER_ID_HEADER, String.valueOf(userId));
+            headers.set("X-Sharer-User-Id", String.valueOf(userId));
         }
         return headers;
     }

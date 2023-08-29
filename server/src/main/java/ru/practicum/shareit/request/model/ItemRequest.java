@@ -4,7 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
@@ -22,7 +21,6 @@ public class ItemRequest {
     private Long id;
 
     @Column
-    @Size(max = 1000)
     private String description;
 
     @ManyToOne

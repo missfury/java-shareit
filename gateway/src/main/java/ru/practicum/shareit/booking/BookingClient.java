@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -15,7 +14,6 @@ import ru.practicum.shareit.client.BaseClient;
 import java.util.Map;
 
 @Service
-@Slf4j
 public class BookingClient extends BaseClient {
     private static final String API_PREFIX = "/bookings";
 
@@ -30,8 +28,17 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> addBooking(long userId, BookItemRequestDto requestDto) {
-        log.info("Create booking for user with id = {} ", userId);
         return post("", userId, requestDto);
+    }
+
+    public ResponseEntity<Object> approveBooking(long userId, long bookingId, Boolean approved) {
+        Map<String, Object> parameters = Map.of(
+                "approved", approved);
+        return patch("/" + bookingId + "?approved={approved}", userId, parameters, null);
+    }
+
+    public ResponseEntity<Object> getBookingById(long userId, Long bookingId) {
+        return get("/" + bookingId, userId);
     }
 
     public ResponseEntity<Object> getBookings(long userId, State state, Integer from, Integer size) {
@@ -40,32 +47,15 @@ public class BookingClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        log.info("Get all booking for user with id = {} ", userId);
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
-        log.info("Get booking for user with id = {} with booking id = {}", userId, bookingId);
-        return get("/" + bookingId, userId);
-    }
-
-
-    public ResponseEntity<Object> getBookingByOwner(long userId, State state, Integer from, Integer size) {
+    public ResponseEntity<Object> getBookingsByOwner(long userId, State state, Integer size, Integer from) {
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
                 "size", size
         );
-        log.info("Get all booking for owner with id = {} ", userId);
         return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
-    }
-
-    public ResponseEntity<Object> approveBooking(long userId, long bookingId,  boolean approved) {
-        final Map<String, Object> parameters = Map.of(
-                "bookingId", bookingId,
-                "approved", approved
-        );
-
-        return patch("/{bookingId}?approved={approved}", userId, parameters);
     }
 }
